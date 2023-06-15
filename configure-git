@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#
+# 'git push' should apply to only the current branch,
+# not to every branchname that matches on local and remote repositories.
+#
+git config --global push.default tracking
+
+# http://chuva-inc.com/blog/2012/09/fast-tip-enable-git-rerere-right-now
+git config --global rerere.enabled 1
+
+#
+# Add some 'insteadOf' configuration entries for drupal.org
+#
+git config --global url."ssh://git@git.drupal.org/project/".insteadOf d.o:
+git config --global url."ssh://git@git.drupal.org/sandbox/".insteadOf d.o-sandbox:
+
+#
+# Add an alias `git unstage <FILE>`
+#
+chkunstage=$(git config --global alias.unstage)
+if [ -z "$chkunstage" ] ; then
+  git config --global alias.unstage 'reset HEAD --'
+fi
