@@ -3,7 +3,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Update our PATH if git-bashrc isn't already in the PATH (idempotent add)
-[ "\$PATH" == "\${PATH/git-bashrc/}" ] && export PATH="\$PATH:$SCRIPT_DIR/scripts"
+[ "$PATH" == "${PATH/git-bashrc/}" ] && export PATH="$PATH:$SCRIPT_DIR/scripts"
 
 # git branch sorted
 alias gbs="git branch --sort=-committerdate"
@@ -12,7 +12,7 @@ alias gbs="git branch --sort=-committerdate"
 alias tnq='tag-next -q && git push --tags'
 
 # git log (pretty)
-alias gl='git log --date=short --pretty=format:"%Cred%h %Cblue%cd %Cgreen%an%Creset %s" -12'
+alias gl='git log --date=short --pretty=format:"%Cred%h %Cblue%ad %Cgreen%an%Creset %s" -12'
 
 # git log (short)
 alias gls='git log --pretty=format:"%Cred%h %Cgreen%an%Creset %s" -12'
@@ -20,11 +20,20 @@ alias gls='git log --pretty=format:"%Cred%h %Cgreen%an%Creset %s" -12'
 # git status
 alias gs='git status'
 
+# Pull in all local working copies that are immediate children of the current working directory
+alias pull-all='for x in * ; do if [ -d $x/.git ] ; then ( cd $x ; s=$(git status -s); if [ -z "$s" ] ; then echo "Update $x." ; git pull ; else echo "$x is modified; skipping update." ; fi ) fi done'
+
 # Todo: make a git alias so this is `git cleanup`
 alias git-cleanup='git branch --merged | grep -v "\*" | xargs -n 1 git branch -d'
 
 # Search the HEAD of every local branch for a pattern
 function grep-branches()
 {
-  git grep $1 $(git show-ref --heads) | grep "refs/heads" | grep $1
+  git grep "$1" $(git show-ref --heads) | grep "refs/heads"
+}
+
+# Search all commits in the current branch for a pattern
+function grep-all()
+{
+  git grep "$1" $(git rev-list --all)
 }

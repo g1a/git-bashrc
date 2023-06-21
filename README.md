@@ -28,6 +28,15 @@ Delete all local branches that have been merged.
 - `grep-branches`
 Run a grep on all branches.
 
+- `grep-all`
+Run grep across all commits in the current branch.
+
+- `clone-all`
+Given a Github token and a Github org name, creates a local working copy of every project in that org.
+
+- `pull-all`
+Iterate over all local working copies that are immediate children of the current working directory, and run `git pull` on each.
+
 ## Automatic Configuration
 
 At installation time, or whenever the `configure-git` script is executed, some basic git defaults will be set. See the script for details.

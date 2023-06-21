@@ -1,0 +1,77 @@
+#!/bin/bash
+
+#
+# Rewrite all of the commits in the current branch of the source repository
+# into an empty / clean / fresh target repository.
+#
+# This script is deisgned to be customized to suit a single purpose.
+#
+
+set -eo pipefail
+
+# Changes to make to every file of every commit
+DEREEK='s/ftp.adc.rsv.r.coh.com/example.com/g -e s/ftp.r.cohsv.com/example.com/g -e s/icoh/eek-o/g -e s/r.ntra/reeko-intra/g'
+
+# Files to completely remove from every commit
+EXCLUSIONS='--exclude="geni-git" --exclude=cookbook --exclude=fix-origin --exclude=fix-various --exclude=git-rm-merged --exclude=clone-local-working-copies.sh'
+
+SOURCE=$(pwd)
+TARGET=$HOME/tmp/rewritten/$(basename $SOURCE)
+TMP=$HOME/tmp/rewrite-tmp
+
+
+# Set up clean empty repo on TARGET
+rm -rf $TARGET
+mkdir -p $TARGET
+git -C $TARGET init
+
+rm -rf $TMP
+mkdir -p $TMP
+
+
+# For each commit, from oldest to newest
+for COMMIT in $((git -C $SOURCE log --pretty=format:"%h" ; echo) | tail -r) ; do
+
+	if [ -n "$COMMIT" ] ; then
+
+		echo "###"
+		echo "### $COMMIT"
+		echo "###"
+
+		# Check out the commit in question from the source
+		git -C $SOURCE checkout $COMMIT
+
+		# Read the commit comment
+		COMMENT="$(git -C $SOURCE log --pretty=format:"%s" -1 | sed -e $DEREEK)"
+		COMMITDATE="$(git -C $SOURCE log --pretty=format:"%cd" -1)"
+		AUTHORNAME="$(git -C $SOURCE log --pretty=format:"%an" -1)"
+		AUTHOREMAIL="$(git -C $SOURCE log --pretty=format:"%ae" -1)"
+
+		echo "$COMMITDATE: $COMMENT"
+
+		# Stash our .git directory away
+		mv $TARGET/.git $TMP
+
+		# Copy everything in SOURCE to TARGET
+		rsync -ravz --delete --exclude='.git' $EXCLUSIONS $SOURCE/ $TARGET >/dev/null
+
+		# Modify TARGET as desired
+		find $TARGET -type f -exec sed -i '' -e $DEREEK {} \;
+
+		# Bring back our .git directory
+		mv -f $TMP/.git $TARGET
+
+		# Commit changes to TARGET
+		set +e
+		git -C $TARGET add .
+		git -C $TARGET commit -m "$COMMENT" --date="$COMMITDATE" --author="$AUTHORNAME <$AUTHOREMAIL>"
+		set -e
+
+	fi
+
+done
+
+# Reset
+git -C $SOURCE checkout main
+
+echo "Finished rewriting repository to $TARGET"
