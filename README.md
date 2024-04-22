@@ -47,7 +47,7 @@ At installation time, or whenever the `configure-git` script is executed, some b
 $ cd $HOME/persistent/install/location
 $ git clone https://github.com/g1a/git-bashrc.git
 $ cd git-bashrc
-$ source bashrc-install.sh
+$ source bashrc-install
 ```
 
 The `bashrc-install.sh` script will do some basic one-time git configuration, and install the git-bashrc file in your `$HOME/.bashrc` file.

@@ -32,10 +32,6 @@ while [ $# -gt 0 ] ; do
 	shift
 
 	case "$option" in
-		--with-cdd )
-			WITH_CDD=true
-			;;
-
 		--bashrc )
 			INSTALL_TO=".bashrc"
 			;;
