@@ -37,3 +37,6 @@ function grep-all()
 {
   git grep "$1" $(git rev-list --all)
 }
+
+# Don't ask when pushing a new branch
+git config --global --type bool push.autoSetupRemote true
