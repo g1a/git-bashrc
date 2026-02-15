@@ -76,3 +76,6 @@ echo "Installed 'source git-bashrc' in ~/$INSTALL_TO"
 
 # Source fd so that it is available in this shell.
 source $SCRIPT_DIR/git-bashrc
+
+# Set default git behavior
+git config pull.rebase true 
